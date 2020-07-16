@@ -33,7 +33,6 @@ fun main() {
         println("$author. $bookName: $textUrl\n$text")
 
     }
-
 //    println(doc.allElements)
 }
 
@@ -55,8 +54,10 @@ fun getPage(url: String): String {
             break
         }
         lines = lines.substring(lines.indexOf('>') + 2)
+//        lines = lines.replace(" <br>\n", "")
         lines = lines.replace(" <br>", "")
         lines = lines.substring(0, lines.length - 6)
+        lines = lines.replace("&nbsp;", "")
         builder.append(lines)
         i++
     }
