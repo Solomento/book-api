@@ -4,34 +4,38 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import java.lang.IndexOutOfBoundsException
 import java.lang.StringBuilder
-import java.net.HttpURLConnection
-import java.net.URL
 
 fun main() {
-    var downloadPages: List<DownloadPage> = listOf()
+    var downloadPages: List<Book> = listOf()
 
-    var doc: Document = Jsoup.connect("https://www.libtxt.ru/page/1/").get()
+    var booksCount = 0
+    for (k in 1..2656) {
 
-    var divElements: Elements = doc.getElementsByAttributeValue("class", "line")
+        var doc: Document = Jsoup.connect("https://www.libtxt.ru/page/$k/").get()
 
-    var url: String
-    var bookName: String
-    var author: String
-    for (element in divElements) {
-        try {
-            var aElement: Element = element.child(0).child(1)
-            url = aElement.attr("href")
-            bookName = aElement.text()
-            aElement = element.child(0).child(0)
-            author = aElement.text()
+        var divElements: Elements = doc.getElementsByAttributeValue("class", "line")
 
-        } catch (e: IndexOutOfBoundsException) {
-            continue
+        var url: String
+        var bookName: String
+        var author: String
+        for (element in divElements) {
+            try {
+                var aElement: Element = element.child(0).child(1)
+                url = aElement.attr("href")
+                bookName = aElement.text()
+                aElement = element.child(0).child(0)
+                author = aElement.text()
+
+            } catch (e: IndexOutOfBoundsException) {
+                continue
+            }
+            val textUrl = movToText(url)
+            val text = getPage(textUrl)
+            if (text.length < 30000) {
+                println(++booksCount)
+                println("$author. $bookName: $textUrl\n$text")
+            }
         }
-        val textUrl = movToText(url)
-        val text = getPage(textUrl)
-        println("$author. $bookName: $textUrl\n$text")
-
     }
 //    println(doc.allElements)
 }
@@ -68,6 +72,6 @@ fun getPageUrl(url: String, page: Int): String {
     return url.substring(0, url.length - 5) + '/' + page + ".html"
 }
 
-class DownloadPage(val url: String, val author: String, val bookName: String, val story: String) {
+class Book(val url: String, val author: String, val bookName: String, val story: String) {
 
 }
