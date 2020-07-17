@@ -19,10 +19,10 @@ object Utils {
         if (!targetDir.exists()) {
             targetDir.mkdirs()
         }
-        val `in`: InputStream = BufferedInputStream(url.openStream(), 1024)
+        val `in` = BufferedInputStream(url.openStream(), 1024)
         // make sure we get the actual file
         val zip = File.createTempFile("arc", ".zip", targetDir)
-        val out: OutputStream = BufferedOutputStream(FileOutputStream(zip))
+        val out = BufferedOutputStream(FileOutputStream(zip))
         copyInputStream(`in`, out)
         out.close()
         return unpackArchive(zip, targetDir)
@@ -44,8 +44,8 @@ object Utils {
         if (!buildDirectory(targetDir)) {
             throw IOException("Could not create directory: $targetDir")
         }
-        val UTF = Charset.forName("Windows-1251")
-        val zipFile = ZipFile(theFile, UTF)
+        val WIN = Charset.forName("CP866")
+        val zipFile = ZipFile(theFile, WIN)
         val entries: Enumeration<*> = zipFile.entries()
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement() as ZipEntry
@@ -54,7 +54,8 @@ object Utils {
                 throw IOException("Could not create directory: " + file.parentFile)
             }
             if (!entry.isDirectory) {
-                copyInputStream(zipFile.getInputStream(entry), BufferedOutputStream(FileOutputStream(file)))
+                if (entry.name.contains(".txt"))
+                    copyInputStream(zipFile.getInputStream(entry), BufferedOutputStream(FileOutputStream(file)))
             } else {
                 if (!buildDirectory(file)) {
                     throw IOException("Could not create directory: $file")
