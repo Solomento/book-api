@@ -5,6 +5,8 @@ import java.nio.file.Files
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import kotlin.math.max
+import kotlin.math.min
 
 object Utils {
     /**
@@ -52,7 +54,7 @@ object Utils {
         val entries: Enumeration<*> = zipFile.entries()
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement() as ZipEntry
-            val file = File(targetDir, File.separator + entry.name.substring(0, entry.name.length - 19) + ".txt")
+            val file = File(targetDir, File.separator + entry.name.substring(0, min(entry.name.length - 19, 120)) + ".txt")
             if (!buildDirectory(file.parentFile)) {
                 throw IOException("Could not create directory: " + file.parentFile)
             }
