@@ -52,7 +52,7 @@ object Utils {
         val entries: Enumeration<*> = zipFile.entries()
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement() as ZipEntry
-            val file = File(targetDir, File.separator + entry.name.substring(0, entry.name.length - 19))
+            val file = File(targetDir, File.separator + entry.name.substring(0, entry.name.length - 19) + ".txt")
             if (!buildDirectory(file.parentFile)) {
                 throw IOException("Could not create directory: " + file.parentFile)
             }
