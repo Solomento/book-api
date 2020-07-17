@@ -3,69 +3,53 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import java.lang.IndexOutOfBoundsException
-import java.lang.StringBuilder
 
 fun main() {
     var downloadPages: List<Book> = listOf()
 
-    var booksCount = 0
-    for (k in 1..2656) {
+    val doc: Document = Jsoup.connect("https://royallib.com/authors-a.html").get()
+    val authorElements: Element = doc.getElementsByAttributeValue("class", "navi").get(0)
 
-        val doc: Document = Jsoup.connect("https://www.libtxt.ru/page/$k/").get()
-        val divElements: Elements = doc.getElementsByAttributeValue("class", "line")
-
-        var url: String
-        var bookName: String
-        var author: String
-        for (element in divElements) {
+    for (element in authorElements.child(0).children()) {
+        for (author in element.child(0).children()) {
             try {
-                var aElement: Element = element.child(0).child(1)
-                url = aElement.attr("href")
-                bookName = aElement.text()
-                aElement = element.child(0).child(0)
-                author = aElement.text()
+                val authorName = author.text()
+                var authorUrl = author.attr("href")
+                if (authorName == "" || authorUrl == "")
+                    throw IndexOutOfBoundsException()
+                // Ссылки на страницы авторов найдены
+                authorUrl = "https:" + authorUrl
+                println("$authorName:")
+                for (book in getBooksUrls(authorUrl)) {
+                    println("${book.first}: ${book.second}")
+                }
 
+                println("---------------------------------")
             } catch (e: IndexOutOfBoundsException) {
                 continue
             }
-            val textUrl = movToText(url)
-            val text = getFullText(textUrl)
-            if (text.length < 30000 && !text.contains("<a href")) {
-                println(++booksCount)
-                println("$author. $bookName: $textUrl\n$text")
-            }
         }
     }
 }
 
-fun movToText(url: String): String {
-    return url.substring(0, url.indexOf("ru") + 3) + "chitat/" + url.substring(url.indexOf("ru") + 3)
-}
+fun getBooksUrls(url: String): List<Pair<String, String>> {
+    var booksUrls = mutableListOf<Pair<String, String>>()
 
-fun getFullText(url: String): String {
-    var i = 1
-    val builder = StringBuilder()
-    var lines: String
-    while (true) {
-        val textDoc = Jsoup.connect(getPageUrl(url, i)).get()
-        val shortStoryElements: Elements = textDoc.getElementsByAttributeValue("id", "news-id-21")
-        try {
-            lines = shortStoryElements[0].child(0).child(0).child(0).child(0).child(3).toString()
-        } catch (e: IndexOutOfBoundsException) {
-            break
-        }
-        lines = lines.substring(lines.indexOf('>') + 2)
-        lines = lines.replace(" <br>", "").replace("&nbsp;", "")
-        lines = lines.substring(0, lines.length - 6)
-        builder.append(lines)
-        i++
+    val authorDoc: Document = Jsoup.connect(url).get()
+    val nameElements: Elements = authorDoc.getElementsByAttributeValue("title", "Скачать книгу")
+    val urlElements: Elements = authorDoc.getElementsByAttributeValue("title", "Читать книгу On-line")
+
+    var url: String
+    var bookName: String
+    for (i in 0 until urlElements.size) {
+        url = "https:" + urlElements[i].attr("href")
+        bookName = nameElements[i].text()
+        booksUrls.add(Pair(bookName, url))
     }
-    return builder.toString()
+    return booksUrls
 }
 
-fun getPageUrl(url: String, page: Int): String {
-    return url.substring(0, url.length - 5) + '/' + page + ".html"
-}
+
 
 class Book(val url: String, val author: String, val bookName: String, val story: String) {
 
