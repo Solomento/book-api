@@ -2,9 +2,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import java.io.File
+import java.lang.IllegalStateException
 import java.lang.IndexOutOfBoundsException
+import java.net.URL
 
 fun main() {
+
+
     var downloadPages: List<Book> = listOf()
 
     val doc: Document = Jsoup.connect("https://royallib.com/authors-a.html").get()
@@ -21,8 +26,18 @@ fun main() {
                 authorUrl = "https:" + authorUrl
                 println("$authorName:")
                 for (book in getBooksUrls(authorUrl)) {
-                    println("${book.first}: ${book.second}")
-                    println(getText(book.second))
+                    println("${book.first}: ")
+
+                    val zipUrl: URL
+                    // Достаю ссылки на zip архивы со страниц
+                    try {
+                        val zipDoc: Document = Jsoup.connect(book.second).get()
+                        val zipElement: Element = zipDoc.select("a:contains(Скачать в формате TXT)").first()
+                        zipUrl = URL("https:" + zipElement.attr("href"))
+                    } catch (e: IllegalStateException) {
+                        continue
+                    }
+                    Utils.unpackArchive(zipUrl, File("res"))
                 }
 
                 println("---------------------------------------------------------------------------------------------")
@@ -34,21 +49,23 @@ fun main() {
 }
 
 fun getBooksUrls(url: String): List<Pair<String, String>> {
-    var booksUrls = mutableListOf<Pair<String, String>>()
+    val booksUrls = mutableListOf<Pair<String, String>>()
 
     val authorDoc: Document = Jsoup.connect(url).get()
     val nameElements: Elements = authorDoc.getElementsByAttributeValue("title", "Скачать книгу")
-    val urlElements: Elements = authorDoc.getElementsByAttributeValue("title", "Читать книгу On-line")
 
     var url: String
     var bookName: String
-    for (i in 0 until urlElements.size) {
-        url = "https:" + urlElements[i].attr("href")
+    for (i in 0 until nameElements.size) {
+        url = "https:" + nameElements[i].attr("href")
         bookName = nameElements[i].text()
         booksUrls.add(Pair(bookName, url))
     }
     return booksUrls
 }
+
+
+
 
 fun getText(url: String): String {
     val txtDoc: Document = Jsoup.connect(url).get()
