@@ -22,9 +22,10 @@ fun main() {
                 println("$authorName:")
                 for (book in getBooksUrls(authorUrl)) {
                     println("${book.first}: ${book.second}")
+                    println(getText(book.second))
                 }
 
-                println("---------------------------------")
+                println("---------------------------------------------------------------------------------------------")
             } catch (e: IndexOutOfBoundsException) {
                 continue
             }
@@ -49,6 +50,13 @@ fun getBooksUrls(url: String): List<Pair<String, String>> {
     return booksUrls
 }
 
+fun getText(url: String): String {
+    val txtDoc: Document = Jsoup.connect(url).get()
+    val contentDiv: Element = txtDoc.getElementsByAttributeValue("id", "contentDiv")[0]
+    println(contentDiv.allElements)
+    var str = contentDiv.children().text()
+    return str
+}
 
 
 class Book(val url: String, val author: String, val bookName: String, val story: String) {
