@@ -1,6 +1,7 @@
 import java.io.*
 import java.net.URL
 import java.nio.charset.Charset
+import java.nio.file.Files
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -15,17 +16,19 @@ object Utils {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun unpackArchive(url: URL, targetDir: File): File {
+    fun unpackArchive(url: URL, targetDir: File) {
         if (!targetDir.exists()) {
             targetDir.mkdirs()
         }
         val `in` = BufferedInputStream(url.openStream(), 1024)
         // make sure we get the actual file
-        val zip = File.createTempFile("arc", ".zip", targetDir)
+        val zip = File.createTempFile("tmp", ".zip", targetDir)
         val out = BufferedOutputStream(FileOutputStream(zip))
         copyInputStream(`in`, out)
+        out.flush()
         out.close()
-        return unpackArchive(zip, targetDir)
+        unpackArchive(zip, targetDir)
+        zip.deleteRecursively()
     }
 
     /**
@@ -49,7 +52,7 @@ object Utils {
         val entries: Enumeration<*> = zipFile.entries()
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement() as ZipEntry
-            val file = File(targetDir, File.separator + entry.name)
+            val file = File(targetDir, File.separator + entry.name.substring(0, entry.name.length - 19))
             if (!buildDirectory(file.parentFile)) {
                 throw IOException("Could not create directory: " + file.parentFile)
             }
