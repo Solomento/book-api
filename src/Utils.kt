@@ -1,12 +1,13 @@
 import java.io.*
 import java.net.URL
+import java.nio.charset.Charset
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 object Utils {
     /**
-     * Unpack and archive from a URL
+     * Unpack an archive from a URL
      *
      * @param url
      * @param targetDir
@@ -43,7 +44,8 @@ object Utils {
         if (!buildDirectory(targetDir)) {
             throw IOException("Could not create directory: $targetDir")
         }
-        val zipFile = ZipFile(theFile)
+        val UTF = Charset.forName("Windows-1251")
+        val zipFile = ZipFile(theFile, UTF)
         val entries: Enumeration<*> = zipFile.entries()
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement() as ZipEntry
