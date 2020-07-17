@@ -11,9 +11,8 @@ fun main() {
     var booksCount = 0
     for (k in 1..2656) {
 
-        var doc: Document = Jsoup.connect("https://www.libtxt.ru/page/$k/").get()
-
-        var divElements: Elements = doc.getElementsByAttributeValue("class", "line")
+        val doc: Document = Jsoup.connect("https://www.libtxt.ru/page/$k/").get()
+        val divElements: Elements = doc.getElementsByAttributeValue("class", "line")
 
         var url: String
         var bookName: String
@@ -30,22 +29,20 @@ fun main() {
                 continue
             }
             val textUrl = movToText(url)
-            val text = getPage(textUrl)
-            if (text.length < 30000) {
+            val text = getFullText(textUrl)
+            if (text.length < 30000 && !text.contains("<a href")) {
                 println(++booksCount)
                 println("$author. $bookName: $textUrl\n$text")
             }
         }
     }
-//    println(doc.allElements)
 }
 
 fun movToText(url: String): String {
-    var textUrl = url.substring(0, url.indexOf("ru") + 3) + "chitat/" + url.substring(url.indexOf("ru") + 3)
-    return textUrl
+    return url.substring(0, url.indexOf("ru") + 3) + "chitat/" + url.substring(url.indexOf("ru") + 3)
 }
 
-fun getPage(url: String): String {
+fun getFullText(url: String): String {
     var i = 1
     val builder = StringBuilder()
     var lines: String
@@ -58,10 +55,8 @@ fun getPage(url: String): String {
             break
         }
         lines = lines.substring(lines.indexOf('>') + 2)
-//        lines = lines.replace(" <br>\n", "")
-        lines = lines.replace(" <br>", "")
+        lines = lines.replace(" <br>", "").replace("&nbsp;", "")
         lines = lines.substring(0, lines.length - 6)
-        lines = lines.replace("&nbsp;", "")
         builder.append(lines)
         i++
     }
