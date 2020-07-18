@@ -3,6 +3,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import java.io.File
+import java.lang.Exception
 import java.net.URL
 import java.time.LocalDateTime
 
@@ -21,39 +22,45 @@ fun main() {
         val authorElements: Element = doc.getElementsByAttributeValue("class", "navi").get(0)
 
         for (element in authorElements.child(0).children()) {
-            for (author in element.child(0).children()) {
-                val authorName: String
-                var authorUrl: String
+            for (column in 0..3) {
                 try {
-                    authorName = author.text()
-                    authorUrl = author.attr("href")
-                    if (authorName == "" || authorUrl == "")
-                        throw IndexOutOfBoundsException()
-                } catch (e: IndexOutOfBoundsException) {
-                    continue
-                }
-                try {
-                    // Ссылки на страницы авторов найдены
-                    authorUrl = "https:" + authorUrl
-                    println(ANSI_RED + "[${LocalDateTime.now()}]" + ANSI_RESET + "\t$authorName:")
-                    for (book in getBooksUrls(authorUrl)) {
-                        println(book.first)
-
-                        val zipUrl: URL
-                        // Достаю ссылки на zip архивы со страниц
+                    for (author in element.child(column).children()) {
+                        val authorName: String
+                        var authorUrl: String
                         try {
-                            val zipDoc: Document = Jsoup.connect(book.second).get()
-                            val zipElement: Element = zipDoc.select("a:contains(Скачать в формате TXT)").first()
-                            zipUrl = URL("https:" + zipElement.attr("href"))
-                        } catch (e: IllegalStateException) {
+                            authorName = author.text()
+                            authorUrl = author.attr("href")
+                            if (authorName == "" || authorUrl == "")
+                                throw IndexOutOfBoundsException()
+                        } catch (e: IndexOutOfBoundsException) {
                             continue
                         }
-                        Utils.unpackArchive(zipUrl, File("res"))
+                        try {
+                            // Ссылки на страницы авторов найдены
+                            authorUrl = "https:" + authorUrl
+                            println(ANSI_RED + "[${LocalDateTime.now()}]" + ANSI_RESET + "\t$authorName:")
+                            for (book in getBooksUrls(authorUrl)) {
+
+                                val zipUrl: URL
+                                // Достаю ссылки на zip архивы со страниц
+                                try {
+                                    val zipDoc: Document = Jsoup.connect(book.second).get()
+                                    val zipElement: Element = zipDoc.select("a:contains(Скачать в формате TXT)").first()
+                                    println(book.first)
+                                    zipUrl = URL("https:" + zipElement.attr("href"))
+                                    Utils.unpackArchive(zipUrl, File("res"))
+                                } catch (e: Exception) {
+                                    continue
+                                }
+                            }
+                        } catch (e: java.lang.IndexOutOfBoundsException) {
+                            // continue
+                        } finally {
+                            println("---------------------------------------------------------------------------------------------")
+                        }
                     }
-                } catch (e: java.lang.IndexOutOfBoundsException) {
+                } catch (e: IndexOutOfBoundsException) {
                     // continue
-                } finally {
-                    println("---------------------------------------------------------------------------------------------")
                 }
             }
         }
