@@ -6,6 +6,7 @@ import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
+import java.net.SocketException
 import kotlin.random.Random
 
 /**
@@ -42,7 +43,12 @@ class Server {
 
             var inputLine: String
             while (true) {
-                inputLine = `in`.readLine()
+                try {
+                    inputLine = `in`.readLine()
+                } catch (e: SocketException) {
+                    println("Клиет отключился")
+                    break
+                }
                 if (inputLine == "bye")
                     break
                 out.println(BookDAO.getById(Random.nextInt(1, count + 1)).url)
