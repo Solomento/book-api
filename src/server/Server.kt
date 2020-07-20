@@ -39,6 +39,7 @@ class Server {
 
         override fun run() {
             println("Клиент подключился")
+
             out = PrintWriter(clientSocket.getOutputStream(), true)
             `in` = BufferedReader(InputStreamReader(clientSocket.getInputStream()))
 
