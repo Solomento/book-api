@@ -38,6 +38,7 @@ class Server {
         lateinit var `in`: BufferedReader
 
         override fun run() {
+            println("Клиент подключился")
             out = PrintWriter(clientSocket.getOutputStream(), true)
             `in` = BufferedReader(InputStreamReader(clientSocket.getInputStream()))
 
