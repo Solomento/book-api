@@ -7,7 +7,7 @@ import java.sql.SQLException
 import java.sql.Statement
 
 object BookDAO {
-    private val SELECT_ALL = "SELECT * FROM SPACE_MARINES"
+    private val SELECT_ALL = "SELECT * FROM BOOKS"
     private val SELECT_BY_ID: String = SELECT_ALL + " WHERE ID = ?"
     private val INSERT = "INSERT INTO BOOKS " +
             "(AUTHOR, TITLE, URL) VALUES (?, ?, ?)"
@@ -42,6 +42,7 @@ object BookDAO {
     @Throws(DAOException::class)
     fun getById(id: Int): Book {
         val preparedStatement = dataSource.getPreparedStatement(SELECT_BY_ID)
+        preparedStatement.setInt(1, id)
         val book: Book
 
         try {
