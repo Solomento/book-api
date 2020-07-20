@@ -34,7 +34,14 @@ class Client {
                 continue
             }
             val br = BufferedReader(FileReader(txtFile, Charset.forName("windows-1251")))
-            for (line in br.lines()) {
+
+            var i = 0
+            val lines = br.readLines()
+            val count = lines.count()
+            for (line in lines) {
+                i++
+                if ((i in 1..11) || (i in count-9 until count))
+                    continue
                 println(line)
             }
         }
