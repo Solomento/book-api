@@ -1,14 +1,14 @@
+package utils
+
 import java.io.*
 import java.net.URL
 import java.nio.charset.Charset
-import java.nio.file.Files
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import kotlin.math.max
 import kotlin.math.min
 
-object Utils {
+object Unpacker {
     /**
      * Unpack an archive from a URL
      *
@@ -60,7 +60,10 @@ object Utils {
             }
             if (!entry.isDirectory) {
                 if (entry.name.contains(".txt"))
-                    copyInputStream(zipFile.getInputStream(entry), BufferedOutputStream(FileOutputStream(file)))
+                    copyInputStream(
+                        zipFile.getInputStream(entry),
+                        BufferedOutputStream(FileOutputStream(file))
+                    )
             } else {
                 if (!buildDirectory(file)) {
                     throw IOException("Could not create directory: $file")

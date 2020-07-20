@@ -4,6 +4,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import utils.Unpacker
+import utils.dao.BookDAO
 import java.io.File
 import java.lang.Exception
 import java.net.URL
@@ -77,10 +79,11 @@ object StoryParser {
                                         printAuthor(authorName)
                                         authorPrinted = true
                                     }
+                                    // Скачиваем архив и распаковываем текст
+                                    BookDAO.insert(Book(bookCounter, authorName, book.first, zipUrl.toString()))
+//                                executorService.submit { Unpacker.unpackArchive(zipUrl, File("res")) }
                                     println("${++bookCounter}: ${book.first}")
                                 }
-                                // Скачиваем архив и распаковываем текс
-                                executorService.submit { Utils.unpackArchive(zipUrl, File("res")) }
                             } catch (e: Exception) {
                                 continue
                             }
@@ -117,7 +120,7 @@ object StoryParser {
         return booksUrls
     }
 
-    fun printAuthor(author: String) {
+    private fun printAuthor(author: String) {
         println(ANSI_RED + "[${LocalDateTime.now()}]" + ANSI_RESET + "\t$author:")
     }
 

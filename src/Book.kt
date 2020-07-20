@@ -1,3 +1,1 @@
-class Book(val url: String, val author: String, val bookName: String, val story: String) {
-
-}
+class Book(var id: Int, val author: String, val title: String, val url: String)
