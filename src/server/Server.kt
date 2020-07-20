@@ -8,7 +8,10 @@ import java.net.ServerSocket
 import java.net.Socket
 import kotlin.random.Random
 
-
+/**
+ *  Самый обыкновенный сервер. Если от клиента приходит любой запрос,
+ *  сервер отсылает ему ссылку на случайный архив с рассказом
+ */
 class Server {
     private lateinit var serverSocket: ServerSocket
     val count = BookDAO.getAll().size
@@ -25,6 +28,10 @@ class Server {
         serverSocket.close()
     }
 
+    /**
+     *  Обработчик клиента. Если сервер встречает нового клиента, он
+     *  отправляет его сюда
+     */
     inner class ClientHandler(val clientSocket: Socket) : Thread() {
         lateinit var out: PrintWriter
         lateinit var `in`: BufferedReader
@@ -33,7 +40,7 @@ class Server {
             out = PrintWriter(clientSocket.getOutputStream(), true)
             `in` = BufferedReader(InputStreamReader(clientSocket.getInputStream()))
 
-            var inputLine: String = ""
+            var inputLine: String
             while (true) {
                 inputLine = `in`.readLine()
                 if (inputLine == "bye")

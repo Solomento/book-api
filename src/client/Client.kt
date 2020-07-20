@@ -20,8 +20,7 @@ class Client {
         val sc = Scanner(System.`in`)
 
         while (sc.hasNextLine()) {
-            out!!.println(sc.nextLine())
-            println(`in`!!.readLine())
+            println(sendMessage(sc.nextLine()))
         }
     }
 
@@ -40,7 +39,7 @@ class Client {
         @JvmStatic
         fun main(args: Array<String>) {
             val client = Client()
-            client.startConnection("127.0.0.1", 6666)
+            client.startConnection("188.18.67.79", 6666)
         }
     }
 }

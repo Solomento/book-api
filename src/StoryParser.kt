@@ -132,8 +132,7 @@ object StoryParser {
         val txtDoc: Document = Jsoup.connect(url).get()
         val contentDiv: Element = txtDoc.getElementsByAttributeValue("id", "contentDiv")[0]
         println(contentDiv.allElements)
-        var str = contentDiv.children().text()
-        return str
+        return contentDiv.children().text()
     }
 
     /**
