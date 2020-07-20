@@ -18,7 +18,7 @@ object Unpacker {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun unpackArchive(url: URL, targetDir: File) {
+    fun unpackArchive(url: URL, targetDir: File): File? {
         if (!targetDir.exists()) {
             targetDir.mkdirs()
         }
@@ -29,8 +29,9 @@ object Unpacker {
         copyInputStream(`in`, out)
         out.flush()
         out.close()
-        unpackArchive(zip, targetDir)
+        val file = unpackArchive(zip, targetDir)
         zip.deleteRecursively()
+        return file
     }
 
     /**
@@ -42,7 +43,7 @@ object Unpacker {
      * @throws IOException
      */
     @Throws(IOException::class)
-    fun unpackArchive(theFile: File, targetDir: File): File {
+    fun unpackArchive(theFile: File, targetDir: File): File? {
         if (!theFile.exists()) {
             throw IOException(theFile.absolutePath + " does not exist")
         }
@@ -52,6 +53,7 @@ object Unpacker {
         val WIN = Charset.forName("CP866")
         val zipFile = ZipFile(theFile, WIN)
         val entries: Enumeration<*> = zipFile.entries()
+        var txtFile: File? = null
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement() as ZipEntry
             val file = File(targetDir, File.separator + entry.name.substring(0, min(entry.name.length, 120)) + ".txt")
@@ -59,11 +61,13 @@ object Unpacker {
                 throw IOException("Could not create directory: " + file.parentFile)
             }
             if (!entry.isDirectory) {
-                if (entry.name.contains(".txt"))
+                if (entry.name.contains(".txt")) {
                     copyInputStream(
-                        zipFile.getInputStream(entry),
-                        BufferedOutputStream(FileOutputStream(file))
+                            zipFile.getInputStream(entry),
+                            BufferedOutputStream(FileOutputStream(file))
                     )
+                    txtFile = file
+                }
             } else {
                 if (!buildDirectory(file)) {
                     throw IOException("Could not create directory: $file")
@@ -71,7 +75,7 @@ object Unpacker {
             }
         }
         zipFile.close()
-        return theFile
+        return txtFile
     }
 
     @Throws(IOException::class)
