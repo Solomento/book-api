@@ -7,6 +7,7 @@ import java.net.Socket
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.*
+import java.util.stream.Collectors
 import kotlin.test.assertEquals
 
 
@@ -22,34 +23,36 @@ class Client {
 
         while (sc.hasNextLine()) {
             val response = sendMessage(sc.nextLine()) ?: break
-            val txtFile: File?
-            try {
-                txtFile = Unpacker.unpackArchive(URL(response), File("res"))
-            } catch (e: IOException) {
-                System.err.println(e.message)
-                continue
-            }
-            if (txtFile == null) {
-                System.err.println("Файл не найден")
-                continue
-            }
-            val br = BufferedReader(FileReader(txtFile, Charset.forName("windows-1251")))
-
-            var i = 0
-            val lines = br.readLines()
-            val count = lines.count()
-            for (line in lines) {
-                i++
-                if ((i in 1..11) || (i in count-9 until count))
-                    continue
-                println(line)
-            }
+            println(response)
+//            val txtFile: File?
+//            try {
+//                txtFile = Unpacker.unpackArchive(URL(response), File("res"))
+//            } catch (e: IOException) {
+//                System.err.println(e.message)
+//                continue
+//            }
+//            if (txtFile == null) {
+//                System.err.println("Файл не найден")
+//                continue
+//            }
+//            val br = BufferedReader(FileReader(txtFile, Charset.forName("windows-1251")))
+//
+//            var i = 0
+//            val lines = br.readLines()
+//            val count = lines.count()
+//            for (line in lines) {
+//                i++
+//                if ((i in 1..11) || (i in count-9 until count))
+//                    continue
+//                println(line)
+//            }
         }
     }
 
     fun sendMessage(msg: String?): String? {
         out!!.println(msg)
-        return `in`!!.readLine()
+        val response = `in`!!.readLine().replace("$", "\n")
+        return response
     }
 
     fun stopConnection() {

@@ -22,8 +22,9 @@ object StoryParser {
 
         val executorService: ExecutorService = Executors.newFixedThreadPool(10)
 
-        val firstLetters = listOf("a", "b", "v", "g", "d", "e", "zh", "z", "i", "j", "k", "l", "m",
-            "n", "o", "p", "r", "s", "t", "u", "f", "x", "c", "ch", "sh", "shh", "eh", "yu", "ya")
+//        val firstLetters = listOf("a", "b", "v", "g", "d", "e", "zh", "z", "i", "j", "k", "l", "m",
+//            "n", "o", "p", "r", "s", "t", "u", "f", "x", "c", "ch", "sh", "shh", "eh", "yu", "ya")
+        val firstLetters = listOf("u")
 
         var bookCounter = 0
         // Пробегаем по каждой букве алфавита
@@ -97,7 +98,7 @@ object StoryParser {
         }
         val timeFinish = System.currentTimeMillis()
         val executionTime = timeFinish - timeStart
-        println(ANSI_RED + "Execution time: " + ANSI_RESET + "${executionTime / 1000 / 60 / 60} hours ${executionTime / 1000 / 60} minutes ${(executionTime / 1000) % 60} seconds")
+        println(ANSI_RED + "Execution time: " + ANSI_RESET + "${executionTime / 1000 / 60 / 60} hours ${(executionTime / 1000 / 60) % 60} minutes ${(executionTime / 1000) % 60} seconds")
     }
 
     /**
